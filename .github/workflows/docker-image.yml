@@ -29,16 +29,18 @@ jobs:
         id: vars
         run: |
           TAG_TS=$(date +%s)
+          REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
           echo "IMAGE_TAG=${TAG_TS}" >> $GITHUB_OUTPUT
+          echo "REPO_LC=${REPO_LC}" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.IMAGE_TAG }} -t ghcr.io/${{ github.repository }}:latest .
+          docker build -t ghcr.io/${{ steps.vars.outputs.REPO_LC }}:${{ steps.vars.outputs.IMAGE_TAG }} -t ghcr.io/${{ steps.vars.outputs.REPO_LC }}:latest .
 
       - name: Push Docker images
         run: |
-          docker push ghcr.io/${{ github.repository }}:${{ steps.vars.outputs.IMAGE_TAG }}
-          docker push ghcr.io/${{ github.repository }}:latest
+          docker push ghcr.io/${{ steps.vars.outputs.REPO_LC }}:${{ steps.vars.outputs.IMAGE_TAG }}
+          docker push ghcr.io/${{ steps.vars.outputs.REPO_LC }}:latest
 
       - name: Prune old images (keep last 7)
         uses: actions/delete-package-versions@v5
